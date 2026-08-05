@@ -1,0 +1,22 @@
+{
+  "name": "Clankerskills",
+  "tags": ["agent", "desktop", "skills"],
+  "defaultAction": "open-clankerskills",
+  "actions": {
+    "open-clankerskills": {
+      "label": "Open Clankerskills",
+      "starts": ["clankerskills-app"]
+    }
+  },
+  "sessions": {
+    "clankerskills-app": {
+      "type": "process",
+      "label": "Clankerskills",
+      "command": ["npm", "run", "start"],
+      "readyUrl": "http://127.0.0.1:43127/health",
+      "openUrl": "http://127.0.0.1:43127",
+      "singleInstance": true
+    }
+  }
+}
+
