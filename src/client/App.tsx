@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { resolveSelection, sameResolvedSkills, sameStringSet } from '../shared/selection';
 import type { AppState, CatalogEntry, SyncResponse } from '../shared/types';
 
@@ -18,7 +18,7 @@ function statusLabel(syncing: boolean, dirty: boolean) {
   return dirty ? 'Unsynced changes' : 'Synced';
 }
 
-function EntryRow({
+export function EntryRow({
   entry,
   selected,
   conflictedNames,
@@ -29,6 +29,8 @@ function EntryRow({
   conflictedNames: Set<string>;
   onToggle: () => void;
 }) {
+  const [expanded, setExpanded] = useState(false);
+  const contentsId = useId();
   const hasConflict =
     selected &&
     (entry.kind === 'skill'
@@ -37,16 +39,30 @@ function EntryRow({
 
   return (
     <li className={`entry ${selected ? 'entry--selected' : ''} ${hasConflict ? 'entry--conflict' : ''}`}>
-      <button className="entry__toggle" type="button" role="checkbox" aria-checked={selected} onClick={onToggle}>
-        <span className="checkbox" aria-hidden="true">{selected ? '×' : ''}</span>
-        <span className="entry__identity">
-          <span className="entry__name">{entry.name}</span>
-          <span className={`entry__kind entry__kind--${entry.kind}`}>{entry.kind}</span>
-        </span>
-        {entry.kind === 'pack' && <span className="entry__meta">{entry.skills.length} skills</span>}
-      </button>
-      {entry.kind === 'pack' && (
-        <ul className="pack-skills" aria-label={`${entry.name} bundled skills`}>
+      <div className="entry__header">
+        <button className="entry__toggle" type="button" role="checkbox" aria-checked={selected} onClick={onToggle}>
+          <span className="checkbox" aria-hidden="true">{selected ? '×' : ''}</span>
+          <span className="entry__identity">
+            <span className="entry__name">{entry.name}</span>
+            <span className={`entry__kind entry__kind--${entry.kind}`}>{entry.kind}</span>
+          </span>
+          {entry.kind === 'pack' && <span className="entry__meta">{entry.skills.length} skills</span>}
+        </button>
+        {entry.kind === 'pack' && (
+          <button
+            className="entry__disclosure"
+            type="button"
+            aria-expanded={expanded}
+            aria-controls={contentsId}
+            aria-label={`${expanded ? 'Collapse' : 'Expand'} ${entry.name}`}
+            onClick={() => setExpanded((current) => !current)}
+          >
+            <span aria-hidden="true">{expanded ? '▾' : '▸'}</span>
+          </button>
+        )}
+      </div>
+      {entry.kind === 'pack' && expanded && (
+        <ul id={contentsId} className="pack-skills" aria-label={`${entry.name} bundled skills`}>
           {entry.skills.map((skill) => {
             const conflict = selected && conflictedNames.has(skill.destinationName.toLocaleLowerCase('en-US'));
             return (

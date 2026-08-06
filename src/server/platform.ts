@@ -1,4 +1,4 @@
-import { execFile } from 'node:child_process';
+import { execFile, spawn } from 'node:child_process';
 import { readdir } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
@@ -23,6 +23,22 @@ export interface PlatformServices {
   convertWindowsPath(target: WslTarget, windowsPath: string): Promise<string>;
   runWsl(target: WslTarget, args: string[]): Promise<void>;
   openFolder(folderPath: string): Promise<void>;
+}
+
+export async function openFolderWithExplorer(folderPath: string, spawnProcess: typeof spawn = spawn): Promise<void> {
+  const explorerPath = path.join(process.env.SystemRoot ?? 'C:\\Windows', 'explorer.exe');
+  await new Promise<void>((resolve, reject) => {
+    const child = spawnProcess(explorerPath, [folderPath], {
+      detached: true,
+      stdio: 'ignore',
+      windowsHide: false,
+    });
+    child.once('error', reject);
+    child.once('spawn', () => {
+      child.unref();
+      resolve();
+    });
+  });
 }
 
 function cleanWslOutput(output: string): string[] {
@@ -73,7 +89,7 @@ export function createPlatformServices(): PlatformServices {
       });
     },
     async openFolder(folderPath) {
-      await execFileAsync('explorer.exe', [folderPath], { encoding: 'utf8', windowsHide: true });
+      await openFolderWithExplorer(folderPath);
     },
   };
 }
@@ -89,4 +105,3 @@ export async function listLocalDirectories(directory: string): Promise<string[]>
     throw error;
   }
 }
-

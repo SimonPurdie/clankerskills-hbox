@@ -39,10 +39,18 @@ button:focus-visible, input:focus-visible {
   height: 100%;
   display: grid;
   grid-template-rows: auto auto auto auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    "header"
+    "status"
+    "message"
+    "toolbar"
+    "catalog"
+    "footer";
   background: var(--base);
 }
 
 .app-header {
+  grid-area: header;
   min-height: 86px;
   padding: 18px 22px 15px;
   display: flex;
@@ -75,6 +83,7 @@ h1 span { color: var(--mint); }
 .close-button:disabled { opacity: .35; cursor: not-allowed; }
 
 .status-strip {
+  grid-area: status;
   height: 38px;
   padding: 0 22px;
   display: flex;
@@ -89,6 +98,7 @@ h1 span { color: var(--mint); }
 .repository-path { margin-left: auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); text-transform: none; letter-spacing: 0; }
 
 .message {
+  grid-area: message;
   padding: 9px 22px;
   border-bottom: 1px solid var(--border);
   font: 12px/1.4 "Cascadia Mono", "Consolas", monospace;
@@ -99,6 +109,7 @@ h1 span { color: var(--mint); }
 .message button { border: 1px solid currentColor; padding: 4px 7px; background: transparent; color: inherit; font: inherit; text-transform: uppercase; cursor: pointer; white-space: nowrap; }
 
 .toolbar {
+  grid-area: toolbar;
   padding: 14px 22px;
   display: flex;
   gap: 14px;
@@ -122,14 +133,17 @@ h1 span { color: var(--mint); }
 .search-box button { border: 0; background: none; color: var(--muted); cursor: pointer; }
 .counts { display: flex; gap: 14px; color: var(--muted); white-space: nowrap; }
 
-.catalog { overflow: auto; background: var(--base); scrollbar-color: var(--border) var(--surface); }
+.catalog { grid-area: catalog; min-height: 0; overflow: auto; background: var(--base); scrollbar-color: var(--border) var(--surface); }
 .entry-list { list-style: none; padding: 8px 0 30px; margin: 0; }
 .entry { border-left: 2px solid transparent; }
 .entry:hover { background: var(--hover); }
 .entry--selected { border-left-color: var(--mint); background: #20241f; }
 .entry--conflict { border-left-color: var(--amber); background: #292419; }
+.entry__header { display: flex; align-items: stretch; }
 .entry__toggle {
-  width: 100%;
+  flex: 1;
+  width: auto;
+  min-width: 0;
   min-height: 49px;
   padding: 0 22px 0 20px;
   display: flex;
@@ -140,6 +154,17 @@ h1 span { color: var(--mint); }
   text-align: left;
   cursor: pointer;
 }
+.entry__disclosure {
+  width: 46px;
+  flex: 0 0 46px;
+  border: 0;
+  border-left: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font: 16px/1 "Cascadia Mono", "Consolas", monospace;
+  cursor: pointer;
+}
+.entry__disclosure:hover { color: var(--frost); background: rgba(0, 0, 0, .14); }
 .checkbox {
   width: 18px;
   height: 18px;
@@ -164,7 +189,7 @@ h1 span { color: var(--mint); }
 .conflict-label { margin-left: auto; text-transform: uppercase; font-size: 9px; letter-spacing: .08em; }
 .empty-state { padding: 45px 22px; text-align: center; color: var(--muted); font: 12px "Cascadia Mono", "Consolas", monospace; }
 
-.app-footer { padding: 12px 22px 18px; border-top: 1px solid var(--border); background: var(--surface); }
+.app-footer { grid-area: footer; padding: 12px 22px 18px; border-top: 1px solid var(--border); background: var(--surface); }
 .folder-actions { display: flex; gap: 5px; margin-bottom: 11px; }
 .folder-actions button { border: 1px solid var(--border); padding: 7px 10px; background: transparent; color: var(--muted); cursor: pointer; }
 .folder-actions button:hover:not(:disabled) { background: var(--hover); color: var(--text); }
